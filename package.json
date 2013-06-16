@@ -1,0 +1,29 @@
+{
+  "name": "loggie",
+  "version": "0.1.0",
+  "description": "An easy-to-use but powerful node.js command-line logger",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kaelzhang/loggie.git"
+  },
+  "author": "kael",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/kaelzhang/loggie/issues"
+  },
+  "keywords": [
+    "console",
+    "warn",
+    "verbose",
+    "error",
+    "log",
+    "logger",
+    "log file",
+    "command-line",
+    "cli"
+  ]
+}
