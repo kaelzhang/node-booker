@@ -7,3 +7,5 @@ var logger = loggie({
 });
 
 logger.info('my label', {a: 1, b: function(){}});
+
+logger.end();

@@ -179,7 +179,7 @@ Loggie.prototype._fnByTemplate = function(name, template) {
 // inspired by [jam](https://github.com/caolan/jam/blob/master/lib/logger.js)
 Loggie.prototype.end = function(msg) {
     this.clean_exit = true;
-    typo.log('{{green|bold OK}}{{bold : msg}}', {
+    typo.log('{{green|bold OK}}: {{bold msg}}', {
         msg: msg || 'done!'
     });
 };
