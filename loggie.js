@@ -79,7 +79,8 @@ function default_log(){
 // @param {Object} options
 // - level: {string} log level
 function Loggie (options){
-    mix(options || {}, DEFAULT_OPTIONS, false);
+    options = options || {};
+    mix(options, DEFAULT_OPTIONS, false);
     Object.defineProperty(this, '__', {
         value: {},
         writable: true
