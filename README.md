@@ -38,10 +38,19 @@ Then, `logger.warn('blah-blah')` will be deactivated and do nothing.
 
 If set to `'*'`, Loggie will enable all log methods.
 
-##### options.catchException
-`Boolean`
+##### options.catch_exceptions
+`Boolean=`
+
+Default to `true`
 
 If set to `true`, Loggie will catch those uncaughtexceptions and log them with `logger.error` method.
+
+##### options.use_exit
+`Boolean=`
+
+Default to `true`
+
+If set to `true`, Loggie will detect `'exit'` event of process, if process exited without `logger.end()` method, it will be considered as a failure.
 
 ### Best practices
 

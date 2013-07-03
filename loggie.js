@@ -46,13 +46,14 @@ var DEFAULT_OPTIONS = {
 
     // global logging level
     level: '*',
-    catchException: true
+    catch_exception: true,
+    use_exit: true
 };
 
 
 var PRESETS = {
     debug: {
-        template: '{{bold label}} {{items}}'
+        template: '{{gray label}} {{items}}'
     },
 
     info: {
@@ -90,14 +91,16 @@ function Loggie (options){
 
     options.level && this.setLevel(options.level);
 
-    if(options.catchException){
+    if(options.catch_exceptions){
         process.on('uncaughtException', function (err) {
             this.error(err);
         });
     }
 
-    this._onExit = this._onExit.bind(this);
-    process.on('exit', this._onExit);
+    if(options.use_exit){
+        this._onExit = this._onExit.bind(this);
+        process.on('exit', this._onExit);
+    }
 }
 
 
