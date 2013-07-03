@@ -45,7 +45,7 @@ function mix (receiver, supplier, override){
 var DEFAULT_OPTIONS = {
 
     // global logging level
-    level: 'info',
+    level: '*',
     catchException: true
 };
 
@@ -101,8 +101,12 @@ function Loggie (options){
 
 
 // @param {string|Array.<string>} 
-loggie.prototype.setLevel = function(level) {
-    this.level = Array.isArray(level) ? level : String(level).split(/\s*,\s*/);
+Loggie.prototype.setLevel = function(level) {
+    this.level = level === '*' ?
+        level : 
+        Array.isArray(level) ?
+            level : 
+            String(level).split(/\s*,\s*/);
 };
 
 
@@ -125,7 +129,7 @@ function overload(fn){
 // @param {Object} logger
 // - fn: {function()|template}
 // - template: 
-loggie.prototype.register = overload( function(name, setting) {
+Loggie.prototype.register = overload( function(name, setting) {
     if(name === 'end'){
         return false;
     }
@@ -145,9 +149,9 @@ loggie.prototype.register = overload( function(name, setting) {
     return true;
 } );
 
-loggie.prototype._createMethod = function(name) {
+Loggie.prototype._createMethod = function(name) {
     return function() {
-        if( ~ this.level.indexOf(name) ){
+        if( this.level === '*' || ~ this.level.indexOf(name) ){
             var setting = this.__[name];
             var fn = setting.fn;
 
@@ -158,7 +162,7 @@ loggie.prototype._createMethod = function(name) {
 
 var AP_slice = Array.prototype.slice;
 
-loggie.prototype._fnByTemplate = function(name, template) {
+Loggie.prototype._fnByTemplate = function(name, template) {
     return function() {
         var args = AP_slice.call(arguments, 0).map(standardize);
 
@@ -172,7 +176,7 @@ loggie.prototype._fnByTemplate = function(name, template) {
 
 
 // inspired by [jam](https://github.com/caolan/jam/blob/master/lib/logger.js)
-loggie.prototype.end = function(msg) {
+Loggie.prototype.end = function(msg) {
     this.clean_exit = true;
     typo.log('{{green|bold OK}}{{bold : msg}}', {
         msg: msg || 'done!'
@@ -180,7 +184,7 @@ loggie.prototype.end = function(msg) {
 };
 
 
-loggie.prototype._onExit = function() {
+Loggie.prototype._onExit = function() {
     if (!this.clean_exit) {
         this.error('Faild!');
         process.removeListener('exit', this._onExit);
