@@ -32,34 +32,29 @@ var DEFAULT_OPTIONS = {
     use_exit: true
 };
 
+var DEFAULT_TEMPLATE = '{{arguments}}';
+
 
 var PRESETS = {
     log: {},
 
     error: {
-        fn: function(value) {
-            return typo.template('{{red|bold ERROR}}') + ( value && value !== '\n' ? ' ' + value : value || ''); 
-        }
+        template: '{{red|bold ERROR}} {{arguments}}'
     },
 
     warn: {
-        fn: function(value) {
-            return typo.template('{{yellow WARN}}') + ( value && value !== '\n' ? ' ' + value : value || '');
-        }
+        template: '{{yellow WARN}} {{arguments}}'
     },
 
     verbose: {
-        argv: '--verbose'
+        argv: '--verbose',
+        template: '{{gray verbose}} {{arguments}}'
     },
 
     debug: {
-        template: '{{magenta [D]}} {{value}}'
+        argv: '--debug',
+        template: '{{magenta [D]}} {{arguments}}'
     }
-};
-
-
-function default_log(value){
-    return value;
 };
 
 
@@ -123,7 +118,7 @@ Loggie.prototype.register = overload( function(name, setting) {
         setting.fn = this._fnByTemplate(setting.template);
     }
 
-    setting.fn = setting.fn || default_log;
+    setting.fn = setting.fn || this._fnByTemplate(DEFAULT_TEMPLATE);
 
     if(!(name in this.__)){
         this[name] = this._createMethod(name);
@@ -156,37 +151,33 @@ Loggie.prototype._parseArgv = function(name, argv) {
 };
 
 
+// name
+// -> this[name]()
+// -> this[name].ln()
 Loggie.prototype._createMethod = function(name) {
-    var ln = function(template, params) {
+    function ln() {
         if( this.level === '*' || ~ this.level.indexOf(name) ){
             var setting = this.__[name];
             var fn = setting.fn;
-            var value;
-
-            if(params){
-                var key;
-                for(key in params){
-                    params[key] = this._standardize( params[key] );
-                }
-
-                value = typo.template(template, params);
-
-            }else{
-                value = this._standardize(template);
-            }
 
             process.stdout.write(
-                fn.call(this, value) + 
+                fn.apply(this, arguments) + 
                 // prevent exception by stdout.write, if the argument is not a string
                 ''
             );
+
+            carriage_return && process.stdout.write('\n');
         }
     };
 
     // logger.log('abc')
-    var method = function(template, params) {
-        ln.call(this, template + '\n', params);
+    function method() {
+        carriage_return = true;
+        ln.apply(this, arguments);
+        carriage_return = false;
     };
+
+    var carriage_return;
 
     // logger.log.ln('abc')
     method.ln = ln;
@@ -209,19 +200,31 @@ Loggie.prototype._standardize = function (subject){
     }
 
     return str;
-}
+};
+
+
+Loggie.prototype.template = function(template, params) {
+    if(params){
+        var key;
+        for( key in params ){
+            params[key] = this._standardize( params[key] );
+        }
+    }
+
+    return typo.template( template, params );
+};
 
 
 var AP_slice = Array.prototype.slice;
 
 Loggie.prototype._fnByTemplate = function(template) {
-    return function(value) {
-        return typo.template(template, {
-            value: value
-        });
+    return function() {
+        var args = AP_slice.call(arguments, 0).map(this._standardize);
+        args['arguments'] = args.join(' ');
+
+        return typo.template(template, args);
     };
 };
-
 
 // inspired by [jam](https://github.com/caolan/jam/blob/master/lib/logger.js)
 Loggie.prototype.end = function(msg) {

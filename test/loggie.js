@@ -3,7 +3,7 @@
 var loggie = require('loggie');
 
 var logger = loggie({
-    level: 'debug',
+    level: 'warn, error',
     use_exit: false
 });
 
@@ -26,12 +26,18 @@ var obj = {
 //     abc: obj
 // })
 
-logger.verbose('abc {{abc}}', {
-    abc: obj
-})
+logger.verbose(obj, 'abc')
+
+logger.debug(obj, 'abc');
+
+logger.warn(obj, 'abc');
+
+logger.error(obj, 'abc');
+
+logger.error( logger.template('{{cyan abc}}') );
 
 // sdfsdf
 
 // logger.warn('abcdefghijk sdfjsdlfkjs kjfksdfjds');
 
-logger.end();
+// logger.end();
