@@ -19,7 +19,7 @@ logger = loggie({
 	level: 'log,error,warn' 
 });
 
-logger.debug('blah-blah'); // will do nothing
+logger.debug('blah-blah'); // will do nothing, 'coz `'debug'` is not in `options.level`
 logger.log('{{cyan install}}', 'loggie'); // will print a cyan 'install', space, and 'loggie'.
 ```
 
