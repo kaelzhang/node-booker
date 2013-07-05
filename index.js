@@ -196,7 +196,7 @@ Loggie.prototype._standardize = function (subject){
         str = util.inspect(subject);
 
     }else{
-        str = subject;
+        str = typo.template(subject);
     }
 
     return str;

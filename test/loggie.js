@@ -32,9 +32,9 @@ logger.debug(obj, 'abc');
 
 logger.warn(obj, 'abc');
 
-logger.error(obj, 'abc');
+logger.error(obj, '{{cyan abc}}');
 
-logger.error( logger.template('{{cyan abc}}') );
+logger.error( logger.template('{{cyan abc}}'), '{{magenta abc}}' );
 
 // sdfsdf
 
