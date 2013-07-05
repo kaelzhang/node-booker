@@ -122,12 +122,12 @@ If you use the template, all arguments will be stringified
 
 ```js
 logger.register('verbose', {
-	template: '{{bold label}} {{1}} {{items}}'
+	template: '{{gray verbose}} {{0}} {{arguments}}'
 });
 logger.verbose('mylabel', 'blah', new Error('error:blah-blah'));
 ```
 
-Will print: **mylabel** blah blah error:blah-blah
+Will print: verbose(gray) mylabel mylabel blah error:blah-blah
 
 
 ##### setting.fn
