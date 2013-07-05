@@ -2,7 +2,7 @@
   "name": "loggie",
   "version": "0.1.1",
   "description": "An easy-to-use but powerful node.js command-line logger",
-  "main": "loggie.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

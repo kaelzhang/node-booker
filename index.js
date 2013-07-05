@@ -7,24 +7,6 @@ module.exports = function(options) {
     return new Loggie(options);
 };
 
-
-function standardize(subject){
-    var str;
-
-    if(subject instanceof Error){
-        str = subject.message || subject.error || subject;
-
-    }else if(typeof subject !== 'string'){
-        str = util.inspect(subject);
-
-    }else{
-        str = subject;
-    }
-
-    return str;
-}
-
-
 function mix (receiver, supplier, override){
     var key;
 
@@ -52,28 +34,33 @@ var DEFAULT_OPTIONS = {
 
 
 var PRESETS = {
-    debug: {
-        template: '{{gray label}} {{items}}'
-    },
-
-    info: {
-        template: '{{cyan label}} {{items}}'
-    },
-
     log: {},
 
     error: {
-        template: '{{red|bold arguments}}'
+        fn: function(value) {
+            return typo.template('{{red|bold ERROR}}') + ( value && value !== '\n' ? ' ' + value : value || ''); 
+        }
     },
 
     warn: {
-        template: '{{yellow arguments}}'
+        fn: function(value) {
+            return typo.template('{{yellow WARN}}') + ( value && value !== '\n' ? ' ' + value : value || '');
+        }
+    },
+
+    verbose: {
+        template: '{{gray arguments}}',
+        argv: '--verbose'
+    },
+
+    debug: {
+        template: '{{magneta [D]}} {{value}}'
     }
 };
 
 
-function default_log(){
-    return console.log.apply(console, arguments);
+function default_log(value){
+    return value;
 };
 
 
@@ -128,7 +115,6 @@ function overload(fn){
 };
 
 
-
 // @param {string} name
 // @param {Object} logger
 // - fn: {function()|template}
@@ -139,7 +125,7 @@ Loggie.prototype.register = overload( function(name, setting) {
     }
 
     if(setting.template){
-        setting.fn = this._fnByTemplate(name, setting.template);
+        setting.fn = this._fnByTemplate(setting.template);
     }
 
     setting.fn = setting.fn || default_log;
@@ -148,33 +134,75 @@ Loggie.prototype.register = overload( function(name, setting) {
         this[name] = this._createMethod(name);
     }
 
+    var argv = setting.argv;
+
+    
+
     this.__[name] = setting;
 
     return true;
 } );
 
+
 Loggie.prototype._createMethod = function(name) {
-    return function() {
+    var ln = function(template, params) {
         if( this.level === '*' || ~ this.level.indexOf(name) ){
             var setting = this.__[name];
             var fn = setting.fn;
+            var value;
 
-            fn && fn.apply(this, arguments);
-        }  
+            if(params){
+                var key;
+                for(key in params){
+                    params[key] = this._standardize( params[key] );
+                }
+
+                value = typo.template(template, params);
+
+            }else{
+                value = this._standardize(template);
+            }
+
+            process.stdout.write( fn.call(this, value) );
+        }
     };
+
+    // logger.log('abc')
+    var method = function(template, params) {
+        ln.call(this, template + '\n', params);
+    };
+
+    // logger.log.ln('abc')
+    method.ln = ln;
+
+    return method;
 };
+
+
+Loggie.prototype._standardize = function (subject){
+    var str;
+
+    if(subject instanceof Error){
+        str = subject.message || subject.error || subject;
+
+    }else if(typeof subject !== 'string'){
+        str = util.inspect(subject);
+
+    }else{
+        str = subject;
+    }
+
+    return str;
+}
+
 
 var AP_slice = Array.prototype.slice;
 
-Loggie.prototype._fnByTemplate = function(name, template) {
-    return function() {
-        var args = AP_slice.call(arguments, 0).map(standardize);
-
-        args['arguments'] = args.join(' ');
-        args['label'] = args[0];
-        args.items = args.slice(1).join(' '); 
-
-        typo.log(template, args);
+Loggie.prototype._fnByTemplate = function(template) {
+    return function(value) {
+        return typo.template(template, {
+            value: value
+        });
     };
 };
 
@@ -188,9 +216,9 @@ Loggie.prototype.end = function(msg) {
 };
 
 
-Loggie.prototype._onExit = function() {
+Loggie.prototype._onExit = function(code) {
     if (!this.clean_exit) {
-        this.error('Faild!');
+        this.error('Faild! Unexpected exit.');
         process.removeListener('exit', this._onExit);
         process.exit(1);
     }
