@@ -69,7 +69,7 @@ function Loggie (options){
     });
 
     if ( options.level ) {
-        this.setLevel(options.level);
+        this._setLevel(options.level);
     }
 
     this.register(PRESETS);
@@ -81,13 +81,23 @@ function Loggie (options){
 }
 
 
+// set log level
 // @param {string|Array.<string>} 
-Loggie.prototype.setLevel = function(level) {
-    this.level = level === '*' ?
-        level : 
-        Array.isArray(level) ?
-            level : 
-            String(level).split(/\s*,\s*/);
+Loggie.prototype._setLevel = function(levels) {
+    this.level = levels === '*' ?
+        levels : 
+        Array.isArray(levels) ?
+            levels : 
+            String(levels).split(/\s*,\s*/);
+};
+
+
+// add a log level
+// @param {string} level
+Loggie.prototype._addLevel = function(level) {
+    if( this.level !== '*' && ! ~ this.level.indexOf(level)){
+        this.level.push(level);
+    }
 };
 
 
@@ -124,7 +134,9 @@ Loggie.prototype.register = overload( function(name, setting) {
         this[name] = this._createMethod(name);
     }
 
-    this._parseArgv(name, setting.argv);
+    if ( setting.argv ) {
+        this._parseArgv(name, setting.argv);
+    }
 
     this.__[name] = setting;
 
@@ -137,16 +149,18 @@ Loggie.prototype.register = overload( function(name, setting) {
 // }
 // if the array of user argv contains '--verbose', add 'verbose' to log level
 Loggie.prototype._parseArgv = function(name, argv) {
-    if( ! ~ this.level.indexOf(name) ){
-        argv = Array.isArray(argv) ? argv : [argv];
+    if(this.level === '*'){
+        return;
+    }
 
-        if(
-            argv.some(function(arg) {
-                return ~ process.argv.indexOf( arg );
-            }) 
-        ){
-            this.level.push(name);
-        }
+    argv = Array.isArray(argv) ? argv : [argv];
+
+    if(
+        argv.some(function(arg) {
+            return ~ process.argv.indexOf( arg );
+        })
+    ){
+        this._addLevel(name);
     }
 };
 
