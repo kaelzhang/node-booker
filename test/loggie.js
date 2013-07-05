@@ -3,7 +3,7 @@
 var loggie = require('loggie');
 
 var logger = loggie({
-    level: '*',
+    level: 'debug',
     use_exit: false
 });
 
@@ -26,7 +26,7 @@ var obj = {
 //     abc: obj
 // })
 
-logger.debug('abc {{abc}}', {
+logger.verbose('abc {{abc}}', {
     abc: obj
 })
 
@@ -35,8 +35,3 @@ logger.debug('abc {{abc}}', {
 // logger.warn('abcdefghijk sdfjsdlfkjs kjfksdfjds');
 
 logger.end();
-
-
-var typo = require('typo');
-
-process.stdout.write( typo.template('{{abc dfsdf}}') )
