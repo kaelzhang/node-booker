@@ -78,12 +78,6 @@ function Loggie (options){
 
     options.level && this.setLevel(options.level);
 
-    if(options.catch_exceptions){
-        process.on('uncaughtException', function (err) {
-            this.error(err);
-        });
-    }
-
     if(options.use_exit){
         this._onExit = this._onExit.bind(this);
         process.on('exit', this._onExit);
