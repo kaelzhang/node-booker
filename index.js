@@ -94,7 +94,7 @@ Loggie.prototype._setLevel = function(levels) {
 
 // add a log level
 // @param {string} level
-Loggie.prototype._addLevel = function(level) {
+Loggie.prototype.addLevel = function(level) {
     if( this.level !== '*' && ! ~ this.level.indexOf(level)){
         this.level.push(level);
     }
@@ -160,7 +160,7 @@ Loggie.prototype._parseArgv = function(name, argv) {
             return ~ process.argv.indexOf( arg );
         })
     ){
-        this._addLevel(name);
+        this.addLevel(name);
     }
 };
 
