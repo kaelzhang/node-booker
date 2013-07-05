@@ -3,17 +3,8 @@
 var loggie = require('loggie');
 
 var logger = loggie({
-    level: '*'
-});
-
-logger.register({
-    info: {
-        template: 'Cortex {{cyan label}} {{items}}'
-    },
-
-    error: {
-        template: 'Cortex {{bold|bg.red ERR}} {{arguments}}'
-    }
+    level: '*',
+    use_exit: false
 });
 
 
@@ -24,17 +15,28 @@ var obj = {
     c: obj
 }
 
-logger.info('my label', obj);
 
+// try{
+//     b;
+// }catch(e){
+//     logger.error(e);
+// }
 
-try{
-    b;
-}catch(e){
-    logger.error(e);
-}
+// logger.log('abc: {{abc}}', {
+//     abc: obj
+// })
 
-logger.warn('abcdefghijk sdfjsdlfkjs kjfksdfjds');
+logger.debug('abc {{abc}}', {
+    abc: obj
+})
 
-logger.debug('instance', 1, {a: 1}, obj)
+// sdfsdf
+
+// logger.warn('abcdefghijk sdfjsdlfkjs kjfksdfjds');
 
 logger.end();
+
+
+var typo = require('typo');
+
+process.stdout.write( typo.template('{{abc dfsdf}}') )

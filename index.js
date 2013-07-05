@@ -49,12 +49,11 @@ var PRESETS = {
     },
 
     verbose: {
-        template: '{{gray arguments}}',
         argv: '--verbose'
     },
 
     debug: {
-        template: '{{magneta [D]}} {{value}}'
+        template: '{{magenta [D]}} {{value}}'
     }
 };
 
@@ -74,9 +73,11 @@ function Loggie (options){
         writable: true
     });
 
-    this.register(PRESETS);
+    if ( options.level ) {
+        this.setLevel(options.level);
+    }
 
-    options.level && this.setLevel(options.level);
+    this.register(PRESETS);
 
     if(options.use_exit){
         this._onExit = this._onExit.bind(this);
@@ -128,14 +129,31 @@ Loggie.prototype.register = overload( function(name, setting) {
         this[name] = this._createMethod(name);
     }
 
-    var argv = setting.argv;
-
-    
+    this._parseArgv(name, setting.argv);
 
     this.__[name] = setting;
 
     return true;
 } );
+
+
+// verbose: {
+//     argv: '--verbose'
+// }
+// if the array of user argv contains '--verbose', add 'verbose' to log level
+Loggie.prototype._parseArgv = function(name, argv) {
+    if( ! ~ this.level.indexOf(name) ){
+        argv = Array.isArray(argv) ? argv : [argv];
+
+        if(
+            argv.some(function(arg) {
+                return ~ process.argv.indexOf( arg );
+            }) 
+        ){
+            this.level.push(name);
+        }
+    }
+};
 
 
 Loggie.prototype._createMethod = function(name) {
@@ -157,7 +175,11 @@ Loggie.prototype._createMethod = function(name) {
                 value = this._standardize(template);
             }
 
-            process.stdout.write( fn.call(this, value) );
+            process.stdout.write(
+                fn.call(this, value) + 
+                // prevent exception by stdout.write, if the argument is not a string
+                ''
+            );
         }
     };
 
