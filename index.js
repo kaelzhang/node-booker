@@ -39,7 +39,7 @@ var PRESETS = {
     log: {},
 
     error: {
-        template: '{{red|bold ERROR}} {{arguments}}'
+        template: '{{red|bold ERR!}} {{arguments}}'
     },
 
     warn: {
