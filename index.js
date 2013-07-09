@@ -36,7 +36,7 @@ var DEFAULT_TEMPLATE = '{{arguments}}';
 
 
 var PRESETS = {
-    log: {},
+    info: {},
 
     error: {
         template: '{{red|bold ERR!}} {{arguments}}'
@@ -184,7 +184,7 @@ Loggie.prototype._createMethod = function(name) {
         }
     };
 
-    // logger.log('abc')
+    // logger.info('abc')
     function method() {
         carriage_return = true;
         ln.apply(this, arguments);
@@ -193,7 +193,7 @@ Loggie.prototype._createMethod = function(name) {
 
     var carriage_return;
 
-    // logger.log.ln('abc')
+    // logger.info.ln('abc')
     method.ln = ln;
 
     return method;
