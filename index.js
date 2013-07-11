@@ -192,9 +192,12 @@ Loggie.prototype._createMethod = function(name) {
     };
 
     var carriage_return;
+    var self = this;
 
     // logger.info.ln('abc')
-    method.ln = ln;
+    method.ln = function() {
+        return ln.apply(self, arguments);
+    };
 
     return method;
 };
