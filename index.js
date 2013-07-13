@@ -1,6 +1,8 @@
 'use strict';
 
-var util = require('util');
+var node_util = require('util');
+var node_events = require('events');
+
 var typo = require('typo');
 
 module.exports = function(options) {
@@ -79,6 +81,9 @@ function Loggie (options){
         process.on('exit', this._onExit);
     }
 }
+
+
+node_util.inherits(Loggie, node_events.EventEmitter);
 
 
 // set log level
@@ -210,7 +215,7 @@ Loggie.prototype._standardize = function (subject){
         str = subject.message || subject.error || subject;
 
     }else if(typeof subject !== 'string'){
-        str = util.inspect(subject);
+        str = node_util.inspect(subject);
 
     }else{
         str = typo.template(subject);
@@ -246,17 +251,46 @@ Loggie.prototype._fnByTemplate = function(template) {
 // inspired by [jam](https://github.com/caolan/jam/blob/master/lib/logger.js)
 Loggie.prototype.end = function(msg) {
     this.clean_exit = true;
-    typo.log('{{green|bold OK}}: {{bold msg}}', {
-        msg: msg || 'done!'
+    
+    this._emit('end', {
+        msg: msg
     });
 };
 
 
 Loggie.prototype._onExit = function(code) {
     if (!this.clean_exit) {
-        this.error('Faild! Unexpected exit.');
+        this._emit('unexpectedExit', {});
+
         process.removeListener('exit', this._onExit);
         process.exit(1);
+    }
+};
+
+var DEFAULT_EVENTS = {
+    unexpectedExit: function() {
+        this.error('Unexpected exit.');
+    },
+
+    end: function(e) {
+        typo.log('{{green|bold OK}}: {{bold msg}}', {
+            msg: e.msg || 'done!'
+        });
+    }
+}
+
+
+Loggie.prototype._emit = function(type, data) {
+    if(!type){
+        return;
+    }
+
+    // if there is no custom event listeners
+    if( node_events.listenerCount(this, type) === 0 ){
+        DEFAULT_EVENTS[type].call(this, Array.prototype.slice.call(arguments, 1) );
+    }else{
+        // this.emit('commandNotFound', command)
+        this.emit.call(this, type, data);
     }
 };
 
