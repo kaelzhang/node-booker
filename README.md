@@ -23,7 +23,7 @@ logger.debug('blah-blah'); // will do nothing, 'coz `'debug'` is not in `options
 logger.log('{{cyan install}}', 'loggie'); // will print a cyan 'install', space, and 'loggie'.
 ```
 
-You could use [typo](https://github.com/kaelzhang/typo) template here to format your output.
+You could use [**typo**](https://github.com/kaelzhang/typo) template here to format your output.
 
 ### loggie(options)
 Will create a new loggie instance
@@ -76,7 +76,7 @@ So, you can use local settings for debugging and development, and will never wor
 ```js
 logger.register({
 	detail: {
-		template: '{{cyan Detail}} {{arguments}}', // 
+		template: '{{cyan|bold|underline Detail}} {{arguments}}', // typo template
 		argv: '--detail'
 	}
 });
@@ -84,7 +84,7 @@ logger.register({
 Then, we defined a log method `logger.detail()`:
 
 ```js
-logger.detail('a'); // might print a cyan 'detail', a whitespace, and an 'a'
+logger.detail('a'); // might print a bold cyan 'detail' with a underline, a whitespace, and an 'a'
 ```
 
 By default, `logger.detail()` will do nothing because it is not in the log level list(`options.level`), but it will be activated if your app is started with '--detail' argument.
@@ -142,9 +142,9 @@ Notice that if `setting.template` is defined, 	`setting.fn` will be overridden.
 
 Method  | Enabled By default | Binded Argv | Leading String
 ------- | ------------------ | ----------- | -------------------
-verbose | no                 | --verbose   | `'verbose '` in gray
+verbose | no                 | --verbose   | `'VERB '` in gray
 debug   | no                 | --debug     | `'[D] '` in magenta
-error   | yes                |             | bold `'ERROR '` in red
+error   | yes                |             | bold `'ERR! '` in red
 warn    | yes                |             | `'WARN '` in yellow
 log     | yes                |             | (nothing)
 

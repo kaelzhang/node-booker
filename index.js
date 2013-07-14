@@ -1,7 +1,7 @@
 'use strict';
 
 var node_util = require('util');
-var node_events = require('events');
+var EventEmitter = require('events').EventEmitter;
 
 var typo = require('typo');
 
@@ -50,7 +50,7 @@ var PRESETS = {
 
     verbose: {
         argv: '--verbose',
-        template: '{{gray verbose}} {{arguments}}'
+        template: '{{gray VERB}} {{arguments}}'
     },
 
     debug: {
@@ -83,7 +83,7 @@ function Loggie (options){
 }
 
 
-node_util.inherits(Loggie, node_events.EventEmitter);
+node_util.inherits(Loggie, EventEmitter);
 
 
 // set log level
@@ -286,7 +286,7 @@ Loggie.prototype._emit = function(type, data) {
     }
 
     // if there is no custom event listeners
-    if( node_events.listenerCount(this, type) === 0 ){
+    if( EventEmitter.listenerCount(this, type) === 0 ){
         DEFAULT_EVENTS[type].call(this, Array.prototype.slice.call(arguments, 1) );
     }else{
         // this.emit('commandNotFound', command)
