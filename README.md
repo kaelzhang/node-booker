@@ -13,17 +13,38 @@ npm install loggie --save
 	
 ## Usage
 
+For most cases, you could use loggie immediately with no extra configurations
+
 ```js
 var loggie = require('loggie');
-logger = loggie({
-	level: 'log,error,warn' 
-});
+logger = loggie();
 
-logger.debug('blah-blah'); // will do nothing, 'coz `'debug'` is not in `options.level`
-logger.log('{{cyan install}}', 'loggie'); // will print a cyan 'install', space, and 'loggie'.
+logger.info('{{cyan install}}', 'loggie'); // will print a cyan 'install', space, and 'loggie'.
 ```
 
 You could use [**typo**](https://github.com/kaelzhang/typo) template here to format your output.
+
+There're several built-in log methods.
+
+### Built-in log methods
+
+Method) | Enabled By default) | Binded Argv) | Leading String)
+------- | ------------------- | ------------ | -------------------
+verbose | no                  | --verbose    | `'VERB '` in gray
+debug   | no                  | --debug      | `'[D] '` in magenta
+error   | yes                 |              | bold `'ERR! '` in red
+warn    | yes                 |              | `'WARN '` in yellow
+info    | yes                 |              | (nothing)
+
+```js
+logger.debug('blah-blah'); // will do nothing
+```
+
+Because `'debug'` is not enabled by default. 
+
+But if you start your app with `'--debug'` option, `logger.debug` will be activated. Or, you could add `'debug'` into **log levels** in loggie options or with `logger.addLevel` method.
+
+## Programming
 
 ### loggie(options)
 Will create a new loggie instance
@@ -35,7 +56,7 @@ Will create a new loggie instance
 
 ```js
 var logger = loggie({
-	level: ['info', 'error'] // can also be 'info,error'
+	level: 'info, error' // can also be ['info', 'error']
 });
 ```
 
@@ -51,7 +72,7 @@ Default to `true`
 
 If set to `true`, Loggie will detect `'exit'` event of process, if process exited without `logger.end()` method, it will be considered as a failure.
 
-### Best practices
+#### Best practices
 
 ```js
 var logger = loggie({
@@ -123,6 +144,7 @@ If you use the template, all arguments will be stringified
 ```js
 logger.register('verbose', {
 	template: '{{gray verbose}} {{0}} {{arguments}}'
+	// notice that the first argument will be duplicated once
 });
 logger.verbose('mylabel', 'blah', new Error('error:blah-blah'));
 ```
@@ -137,14 +159,4 @@ The log method.
 
 Notice that if `setting.template` is defined, 	`setting.fn` will be overridden.
 
-
-### Built-in log methods
-
-Method  | Enabled By default | Binded Argv | Leading String
-------- | ------------------ | ----------- | -------------------
-verbose | no                 | --verbose   | `'VERB '` in gray
-debug   | no                 | --debug     | `'[D] '` in magenta
-error   | yes                |             | bold `'ERR! '` in red
-warn    | yes                |             | `'WARN '` in yellow
-log     | yes                |             | (nothing)
 

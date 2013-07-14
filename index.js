@@ -29,7 +29,7 @@ function mix (receiver, supplier, override){
 var DEFAULT_OPTIONS = {
 
     // global logging level
-    level: '*',
+    level: 'info, error, warn',
     catch_exception: true,
     use_exit: true
 };
@@ -71,7 +71,7 @@ function Loggie (options){
     });
 
     if ( options.level ) {
-        this._setLevel(options.level);
+        this._setLevels(options.level);
     }
 
     this.register(PRESETS);
@@ -88,7 +88,7 @@ node_util.inherits(Loggie, EventEmitter);
 
 // set log level
 // @param {string|Array.<string>} 
-Loggie.prototype._setLevel = function(levels) {
+Loggie.prototype._setLevels = function(levels) {
     this.level = levels === '*' ?
         levels : 
         Array.isArray(levels) ?
