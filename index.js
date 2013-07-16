@@ -76,6 +76,16 @@ function Loggie (options){
 
     this.register(PRESETS);
 
+    var self = this;
+    if(options.catch_exception){
+        // > Note that uncaughtException is a very crude mechanism for exception handling and may be removed in the future.
+        // There's not any good way to solve exceptions.
+        // I would optimize loggie if the APIs of `cluster` or `domains` went stable
+        process.on('uncaughtException', function(err) {
+            self._emit('uncaughtException', err);
+        });
+    }
+
     if(options.use_exit){
         this._onExit = this._onExit.bind(this);
         process.on('exit', this._onExit);
@@ -212,7 +222,12 @@ Loggie.prototype._standardize = function (subject){
     var str;
 
     if(subject instanceof Error){
-        str = subject.message || subject.error || subject;
+        str = 
+            // detail information
+            subject.stack || 
+            subject.message || 
+            subject.error || 
+            subject;
 
     }else if(typeof subject !== 'string'){
         str = node_util.inspect(subject);
@@ -250,7 +265,7 @@ Loggie.prototype._fnByTemplate = function(template) {
 
 // inspired by [jam](https://github.com/caolan/jam/blob/master/lib/logger.js)
 Loggie.prototype.end = function(msg) {
-    this.clean_exit = true;
+    this._clean_exit = true;
     
     this._emit('end', {
         msg: msg
@@ -259,8 +274,8 @@ Loggie.prototype.end = function(msg) {
 
 
 Loggie.prototype._onExit = function(code) {
-    if (!this.clean_exit) {
-        this._emit('unexpectedExit', {});
+    if (!this._clean_exit) {
+        this._emit('unexpectedExit');
 
         process.removeListener('exit', this._onExit);
         process.exit(1);
@@ -270,6 +285,10 @@ Loggie.prototype._onExit = function(code) {
 var DEFAULT_EVENTS = {
     unexpectedExit: function() {
         this.error('Unexpected exit.');
+    },
+
+    uncaughtException: function(err) {
+        this.error(err);
     },
 
     end: function(e) {
@@ -287,10 +306,10 @@ Loggie.prototype._emit = function(type, data) {
 
     // if there is no custom event listeners
     if( EventEmitter.listenerCount(this, type) === 0 ){
-        DEFAULT_EVENTS[type].call(this, Array.prototype.slice.call(arguments, 1) );
+        DEFAULT_EVENTS[type].apply(this, Array.prototype.slice.call(arguments, 1) );
     }else{
         // this.emit('commandNotFound', command)
-        this.emit.call(this, type, data);
+        this.emit.apply(this, arguments);
     }
 };
 
