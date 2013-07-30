@@ -11,7 +11,7 @@
     "url": "git://github.com/kaelzhang/loggie.git"
   },
   "author": "kael",
-  "license": "BSD",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/kaelzhang/loggie/issues"
   },
