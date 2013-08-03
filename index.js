@@ -31,7 +31,7 @@ var DEFAULT_OPTIONS = {
     // global logging level
     level: 'info, error, warn',
     catch_exception: true,
-    use_exit: true
+    use_exit: false
 };
 
 var DEFAULT_TEMPLATE = '{{arguments}}';
@@ -62,6 +62,10 @@ var PRESETS = {
 
 // @param {Object} options
 // - level: {string} log level
+// - output: {Stream.Writeable=process.stdout} typo output
+// - clean: {boolean=} typo clean
+// - use_exit: {boolean=}
+// - catch_exception: {boolean=}
 function Loggie (options){
     options = options || {};
 

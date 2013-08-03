@@ -4,7 +4,9 @@ var loggie = require('loggie');
 
 var logger = loggie({
     level: 'warn, error',
-    use_exit: false
+    use_exit: false,
+    output: process.stdout,
+    clean: ~ process.argv.indexOf('--clean')
 });
 
 
