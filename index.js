@@ -64,6 +64,12 @@ var PRESETS = {
 // - level: {string} log level
 function Loggie (options){
     options = options || {};
+
+    // default to `process.stdout`
+    options.output = options.output || process.stdout;
+
+    this.typo = typo(options);
+
     mix(options, DEFAULT_OPTIONS, false);
     Object.defineProperty(this, '__', {
         value: {},
@@ -189,13 +195,8 @@ Loggie.prototype._createMethod = function(name) {
             var setting = this.__[name];
             var fn = setting.fn;
 
-            process.stdout.write(
-                fn.apply(this, arguments) + 
-                // prevent exception by stdout.write, if the argument is not a string
-                ''
-            );
-
-            carriage_return && process.stdout.write('\n');
+            this.typo.write( fn.apply(this, arguments) );
+            carriage_return && this.typo.write('\n');
         }
     };
 
@@ -233,13 +234,14 @@ Loggie.prototype._standardize = function (subject){
         str = node_util.inspect(subject);
 
     }else{
-        str = typo.template(subject);
+        str = this.typo.template(subject);
     }
 
     return str;
 };
 
 
+// Subtitute a template with the given data
 Loggie.prototype.template = function(template, params) {
     if(params){
         var key;
@@ -248,18 +250,20 @@ Loggie.prototype.template = function(template, params) {
         }
     }
 
-    return typo.template( template, params );
+    return this.typo.template( template, params );
 };
 
 
 var AP_slice = Array.prototype.slice;
 
 Loggie.prototype._fnByTemplate = function(template) {
+    var self = this;
+
     return function() {
-        var args = AP_slice.call(arguments, 0).map(this._standardize);
+        var args = AP_slice.call(arguments, 0).map(this._standardize, this);
         args['arguments'] = args.join(' ');
 
-        return typo.template(template, args);
+        return self.typo.template(template, args);
     };
 };
 
@@ -292,7 +296,7 @@ var DEFAULT_EVENTS = {
     },
 
     end: function(e) {
-        typo.log('{{green|bold OK}}: {{bold msg}}', {
+        this.typo.log('{{green|bold OK}}: {{bold msg}}', {
             msg: e.msg || 'done!'
         });
     }
