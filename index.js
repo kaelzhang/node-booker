@@ -235,8 +235,13 @@ Loggie.prototype._standardize = function (subject){
             subject;
 
     }else if(typeof subject !== 'string'){
-        str = node_util.inspect(subject);
 
+        // If we explicitly define a `toString` method to an object
+        if ( subject && subject.hasOwnProperty('toString') ) {
+            str = subject.toString();
+        }else{
+            str = node_util.inspect(subject);
+        }
     }else{
         str = this.typo.template(subject);
     }

@@ -1,6 +1,6 @@
 {
   "name": "loggie",
-  "version": "0.1.10",
+  "version": "0.2.1",
   "description": "An easy-to-use but powerful node.js command-line logger",
   "main": "index.js",
   "scripts": {

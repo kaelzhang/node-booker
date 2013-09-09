@@ -6,7 +6,7 @@ var logger = loggie({
     level: 'warn, error',
     use_exit: false,
     output: process.stdout,
-    clean: ~ process.argv.indexOf('--clean')
+    colors: ! ~ process.argv.indexOf('--clean')
 });
 
 
