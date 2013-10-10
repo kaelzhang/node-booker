@@ -318,7 +318,7 @@ Loggie.prototype._emit = function(type, data) {
     }
 
     // if there is no custom event listeners
-    if( EventEmitter.listenerCount(this, type) === 0 ){
+    if( this.listeners(type).length === 0 ){
         DEFAULT_EVENTS[type].apply(this, Array.prototype.slice.call(arguments, 1) );
     }else{
         // this.emit('commandNotFound', command)
